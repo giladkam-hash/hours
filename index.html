@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://script.google.com https://script.googleusercontent.com">
+<title>יומן שעות</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="יומן שעות">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-180.png">
+<style>
+:root{
+  --bg:#eef1f4; --paper:#ffffff; --ink:#18222d; --muted:#5d6b7a; --line:#d5dce3;
+  --accent:#1f5fa8; --accent-soft:#e2ecf8; --on-accent:#ffffff; --danger:#b3261e; --danger-soft:#fbe9e7; --ok:#2e7d4f;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#10161d; --paper:#18212b; --ink:#e6edf4; --muted:#93a2b2; --line:#2b3744;
+  --accent:#6aa6ee; --accent-soft:#1d2f45; --on-accent:#0c1622; --danger:#f08a82; --danger-soft:#3a2120; --ok:#6fcf97;
+  color-scheme:dark}}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;font-size:16px;line-height:1.45}
+.wrap{max-width:560px;margin:0 auto;padding-top:calc(16px + env(safe-area-inset-top,0px));padding-bottom:calc(96px + env(safe-area-inset-bottom,0px));
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:16px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{font-weight:700;font-size:1.5rem;margin:0}
+.total{font-variant-numeric:tabular-nums;color:var(--muted);font-size:.95rem}
+.total b{color:var(--ink);font-size:1.25rem}
+.month{display:flex;align-items:center;gap:8px}
+.month span{font-weight:700;min-width:7.5em;text-align:center}
+button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.iconbtn{border:1px solid var(--line);background:var(--paper);border-radius:8px;width:44px;height:44px;font-size:1.1rem}
+.tab{display:flex;flex-direction:column;gap:16px}
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:4;display:flex;background:var(--paper);border-top:1px solid var(--line);
+  padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+.tabbar button{flex:1;min-width:0;border:none;background:none;padding:14px 2px;font-size:.88rem;font-weight:500;color:var(--muted);border-top:3px solid transparent}
+.tabbar button[aria-current="page"]{color:var(--accent);font-weight:700;border-top-color:var(--accent)}
+.banner{background:var(--danger-soft);color:var(--danger);border:1px solid var(--danger);border-radius:10px;padding:10px 12px;font-size:.9rem}
+.chosen{display:flex;align-items:center;gap:10px;background:var(--accent-soft);border:1px solid var(--accent);border-radius:10px;padding:10px 12px}
+.pnum{font-weight:700;font-variant-numeric:tabular-nums;flex:none}
+.pname{flex:1;min-width:0;overflow-wrap:anywhere}
+.plist{display:flex;flex-direction:column;max-height:300px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.pick{display:flex;align-items:center;gap:10px;width:100%;text-align:right;background:none;border:none;border-bottom:1px solid var(--line);padding:11px 2px;min-height:44px}
+.pick .pnum{color:var(--accent)}
+.plist .label{padding-top:8px}
+.prow{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);min-height:44px}
+.prow:last-child{border-bottom:none}
+.stack{display:flex;flex-direction:column;gap:4px}
+.stack input{width:100%}
+.req{color:var(--danger)}
+.days{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scroll-snap-type:x proximity}
+.day{flex:0 0 auto;width:48px;border:1px solid var(--line);background:var(--paper);border-radius:10px;padding:6px 0;
+  display:flex;flex-direction:column;align-items:center;gap:1px;scroll-snap-align:center;font-variant-numeric:tabular-nums}
+.day small{font-size:.72rem;color:var(--muted)}
+.day .n{font-weight:700;font-size:1.05rem}
+.day .h{font-size:.72rem;min-height:1.1em;color:var(--accent);font-weight:500}
+.day.weekend{background:transparent;border-style:dashed}
+.day.today .n{color:var(--accent)}
+.day.sel{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.day.sel small,.day.sel .h,.day.sel .n{color:var(--on-accent)}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:14px}
+.label{font-size:.78rem;letter-spacing:.04em;color:var(--muted);font-weight:500}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.chip{border:1px solid var(--line);background:transparent;border-radius:999px;padding:8px 14px;font-size:.95rem}
+.chip.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:700}
+.linkbtn{background:none;border:none;color:var(--accent);font-size:.85rem;padding:4px}
+input[type=text],input[type=search],input[type=email],input[type=url]{font:inherit;-webkit-appearance:none;appearance:none;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px;min-width:0}
+input.ltr{direction:ltr;text-align:left}
+.stepper{display:flex;align-items:center;gap:12px;justify-content:center}
+.stepper button{width:48px;height:48px;border-radius:12px;border:1px solid var(--line);background:var(--bg);font-size:1.5rem}
+.stepper output{font-size:2.4rem;font-weight:700;min-width:3.2em;text-align:center;font-variant-numeric:tabular-nums}
+.primary{border:none;background:var(--accent);color:var(--on-accent);border-radius:12px;padding:14px;font-weight:700;font-size:1.05rem}
+.primary:disabled,.secondary:disabled{opacity:.45;cursor:not-allowed}
+.secondary{border:1px solid var(--line);background:transparent;border-radius:12px;padding:12px;font-weight:500}
+.log{display:flex;flex-direction:column}
+.log .item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.log .item:last-child{border-bottom:none}
+.log .p{flex:1;min-width:0;overflow-wrap:anywhere}
+.hh{font-variant-numeric:tabular-nums;font-weight:700}
+.del{border:none;background:none;color:var(--danger);font-size:1.2rem;min-width:44px;height:44px;flex:none}
+.empty{color:var(--muted);font-size:.92rem;margin:0}
+.sum{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.sum td{padding:8px 0;border-bottom:1px solid var(--line)}
+.sum td:last-child{text-align:left;font-weight:700}
+.sum tr:last-child td{border-bottom:none}
+.note{font-size:.85rem;color:var(--muted);margin:0}
+.xlist{display:flex;flex-direction:column}
+.xrow{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.xrow:last-child{border-bottom:none}
+.xrow input{width:20px;height:20px;flex:none;accent-color:var(--accent)}
+.xrow .d{color:var(--muted);flex:none}
+.xrow .p{flex:1;min-width:0;overflow-wrap:anywhere}
+.xrow .hh{flex:none}
+.xrow.done{color:var(--muted)}
+.xrow .ok{color:var(--ok);font-weight:700;flex:none}
+.fields{display:flex;flex-direction:column;gap:8px}
+.warn{font-size:.85rem;color:var(--danger);margin:0}
+.good{font-size:.85rem;color:var(--ok);margin:0}
+.toast{position:fixed;bottom:calc(72px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);
+  padding:10px 16px;border-radius:10px;font-size:.9rem;z-index:5;max-width:calc(100vw - 32px)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>יומן שעות</h1>
+    <div class="total">סה״כ בחודש: <b id="mtotal">0</b> ש׳</div>
+  </header>
+
+  <div class="banner" id="banner" role="alert" hidden></div>
+
+  <div class="month" id="monthbar">
+    <button class="iconbtn" id="prev" aria-label="חודש קודם">›</button>
+    <span id="mname"></span>
+    <button class="iconbtn" id="next" aria-label="חודש הבא">‹</button>
+  </div>
+
+  <div class="tab" id="tab-report">
+    <div class="days" id="days" aria-label="ימים בחודש"></div>
+    <section class="card" aria-labelledby="addh">
+      <span class="label" id="addh">פרויקט</span>
+      <div class="chosen" id="chosen" hidden>
+        <span class="pnum" id="cnum"></span><span class="pname" id="cname"></span>
+        <button class="linkbtn" id="change">החלפה</button>
+      </div>
+      <div class="fields" id="picker">
+        <input type="search" id="psearch" placeholder="חיפוש לפי מספר או שם" autocomplete="off" enterkeyhint="search" aria-label="חיפוש פרויקט">
+        <div class="plist" id="plist"></div>
+      </div>
+      <span class="label">שעות</span>
+      <div class="stepper">
+        <button id="minus" aria-label="פחות חצי שעה">−</button>
+        <output id="hours">1</output>
+        <button id="plus" aria-label="עוד חצי שעה">+</button>
+      </div>
+      <div class="chips" id="quick"></div>
+      <button class="primary" id="add">הוספה</button>
+    </section>
+    <section class="card" aria-labelledby="dayh">
+      <div class="row"><span class="label" id="dayh"></span><span class="hh" id="dtotal"></span></div>
+      <div class="log" id="log"></div>
+    </section>
+  </div>
+
+  <div class="tab" id="tab-projects" hidden>
+    <section class="card" aria-labelledby="newh">
+      <span class="label" id="newh">פרויקט חדש</span>
+      <label class="stack"><span>מספר פרויקט <span class="req">*</span></span><input type="text" id="nnum" inputmode="numeric" autocomplete="off" placeholder="כמו במאסטר פלן"></label>
+      <label class="stack"><span>שם פרויקט <span class="req">*</span></span><input type="text" id="nname" autocomplete="off" placeholder="לדוגמה: הרצל 10 תל אביב"></label>
+      <p class="warn" id="nerr" hidden></p>
+      <button class="primary" id="nsave">שמירת פרויקט</button>
+    </section>
+    <section class="card" aria-labelledby="allh">
+      <div class="row"><span class="label" id="allh">כל הפרויקטים</span><span class="note" id="pcount"></span></div>
+      <input type="search" id="asearch" placeholder="חיפוש לפי מספר או שם" autocomplete="off" enterkeyhint="search" aria-label="חיפוש ברשימת הפרויקטים">
+      <div id="pall"></div>
+    </section>
+  </div>
+
+  <div class="tab" id="tab-export" hidden>
+    <section class="card" aria-labelledby="sumh">
+      <span class="label" id="sumh">סיכום לפי פרויקט</span>
+      <div id="sum"></div>
+    </section>
+    <section class="card" aria-labelledby="exph">
+      <div class="row"><span class="label" id="exph">קובץ למאסטר פלן</span><button class="linkbtn" id="xall">ניקוי הבחירה</button></div>
+      <div class="xlist" id="xrows"></div>
+      <div class="fields" id="xwarn"></div>
+      <button class="primary" id="xsend">שליחה במייל</button>
+      <button class="secondary" id="xshare">שיתוף הקובץ בדרך אחרת</button>
+      <button class="secondary" id="xdone">סימון השורות כנקלטו</button>
+      <p class="note" id="xnote"></p>
+    </section>
+  </div>
+
+  <div class="tab" id="tab-settings" hidden>
+    <section class="card" id="installcard" hidden>
+      <span class="label">התקנה באייפון</span>
+      <p class="note">ב-Safari לוחצים על כפתור השיתוף, בוחרים "הוסף למסך הבית", ופותחים את האפליקציה מהאייקון החדש. כדאי לחבר את הגיבוי רק משם, כי לאפליקציה במסך הבית יש אחסון נפרד מ-Safari.</p>
+    </section>
+    <section class="card" aria-labelledby="cloudh">
+      <span class="label" id="cloudh">גיבוי לחשבון Google</span>
+      <label class="stack"><span>כתובת הסקריפט</span><input type="url" class="ltr" id="surl" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="https://script.google.com/.../exec"></label>
+      <label class="stack"><span>מפתח סודי</span><input type="text" class="ltr" id="skey" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
+      <button class="primary" id="sconnect">חיבור ושחזור מהגיבוי</button>
+      <p class="note" id="sstatus"></p>
+    </section>
+    <section class="card" aria-labelledby="meh">
+      <span class="label" id="meh">פרטים לקובץ</span>
+      <label class="stack"><span>מספר עובד במאסטר פלן</span><input type="text" id="semp" inputmode="numeric" autocomplete="off"></label>
+      <label class="stack"><span>כתובת המייל לקבלת הקובץ</span><input type="email" class="ltr" id="smail" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
+      <button class="secondary" id="stest">שליחת מייל בדיקה</button>
+    </section>
+  </div>
+</div>
+
+<nav class="tabbar" aria-label="לשוניות">
+  <button data-tab="report" aria-current="page">דיווח</button>
+  <button data-tab="projects">פרויקטים</button>
+  <button data-tab="export">קובץ חודשי</button>
+  <button data-tab="settings">הגדרות</button>
+</nav>
+
+<script src="xlsx.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
