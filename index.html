@@ -8,91 +8,166 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="יומן שעות">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#14375a">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-180.png">
 <style>
+/* Drafting-sheet look: blueprint header with a drawing title block, paper cards below. */
 :root{
-  --bg:#eef1f4; --paper:#ffffff; --ink:#18222d; --muted:#5d6b7a; --line:#d5dce3;
-  --accent:#1f5fa8; --accent-soft:#e2ecf8; --on-accent:#ffffff; --danger:#b3261e; --danger-soft:#fbe9e7; --ok:#2e7d4f;
+  --bg:#f2efe7; --paper:#fffdf8; --ink:#17232f; --muted:#657080; --line:#ded8ca;
+  --sheet:#14375a; --sheet-ink:#f4f7fb; --sheet-muted:#a9bfd6; --sheet-line:rgba(255,255,255,.22); --sheet-grid:rgba(255,255,255,.055);
+  --accent:#17609f; --accent-soft:#e0ebf5; --on-accent:#ffffff;
+  --ok:#2a8259; --ok-soft:#dff0e7; --mark:#b86e0b; --mark-soft:#fbeed7; --danger:#b8322a; --danger-soft:#fae6e3;
   color-scheme:light;
 }
 @media (prefers-color-scheme:dark){:root{
-  --bg:#10161d; --paper:#18212b; --ink:#e6edf4; --muted:#93a2b2; --line:#2b3744;
-  --accent:#6aa6ee; --accent-soft:#1d2f45; --on-accent:#0c1622; --danger:#f08a82; --danger-soft:#3a2120; --ok:#6fcf97;
+  --bg:#0f151c; --paper:#18212b; --ink:#e7edf3; --muted:#95a3b3; --line:#2c3845;
+  --sheet:#10283f; --sheet-line:rgba(255,255,255,.16);
+  --accent:#6cabec; --accent-soft:#1c3047; --on-accent:#0b1520;
+  --ok:#6fcf9b; --ok-soft:#183228; --mark:#f0b04f; --mark-soft:#3a2c14; --danger:#f19088; --danger-soft:#3b2120;
   color-scheme:dark}}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;font-size:16px;line-height:1.45}
-.wrap{max-width:560px;margin:0 auto;padding-top:calc(16px + env(safe-area-inset-top,0px));padding-bottom:calc(96px + env(safe-area-inset-bottom,0px));
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
-  display:flex;flex-direction:column;gap:16px}
-header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-h1{font-weight:700;font-size:1.5rem;margin:0}
-.total{font-variant-numeric:tabular-nums;color:var(--muted);font-size:.95rem}
-.total b{color:var(--ink);font-size:1.25rem}
-.month{display:flex;align-items:center;gap:8px}
-.month span{font-weight:700;min-width:7.5em;text-align:center}
 button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.iconbtn{border:1px solid var(--line);background:var(--paper);border-radius:8px;width:44px;height:44px;font-size:1.1rem}
+.num{direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums}
+
+.hero{background-color:var(--sheet);color:var(--sheet-ink);
+  background-image:linear-gradient(var(--sheet-grid) 1px,transparent 1px),linear-gradient(90deg,var(--sheet-grid) 1px,transparent 1px);background-size:22px 22px;
+  padding-top:calc(12px + env(safe-area-inset-top,0px));padding-bottom:16px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.hero-in{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.hero-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+h1{font-weight:800;font-size:1.45rem;margin:0;letter-spacing:-.01em}
+.gear{width:44px;height:44px;border:1px solid var(--sheet-line);border-radius:10px;background:transparent;color:var(--sheet-ink);display:grid;place-items:center}
+.gear svg{width:22px;height:22px}
+.month{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.month span{font-weight:700;font-size:1.05rem}
+.navbtn{width:44px;height:40px;border:1px solid var(--sheet-line);border-radius:10px;background:transparent;color:var(--sheet-ink);font-size:1.15rem}
+.block{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--sheet-line);border-radius:8px}
+.block div{padding:7px 10px;min-width:0;display:flex;flex-direction:column}
+.block div+div{border-inline-start:1px solid var(--sheet-line)}
+.block small{font-size:.72rem;color:var(--sheet-muted)}
+.block b{font-size:1.25rem;font-weight:700}
+
+.wrap{max-width:560px;margin:0 auto;padding-top:16px;padding-bottom:calc(92px + env(safe-area-inset-bottom,0px));
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:16px}
 .tab{display:flex;flex-direction:column;gap:16px}
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:4;display:flex;background:var(--paper);border-top:1px solid var(--line);
   padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
-.tabbar button{flex:1;min-width:0;border:none;background:none;padding:14px 2px;font-size:.88rem;font-weight:500;color:var(--muted);border-top:3px solid transparent}
-.tabbar button[aria-current="page"]{color:var(--accent);font-weight:700;border-top-color:var(--accent)}
+.tabbar button{flex:1;min-width:0;border:none;background:none;padding:8px 2px 7px;font-size:.76rem;font-weight:500;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:2px}
+.tabbar svg{width:23px;height:23px}
+.tabbar button[aria-current="page"]{color:var(--accent);font-weight:700}
+
 .banner{background:var(--danger-soft);color:var(--danger);border:1px solid var(--danger);border-radius:10px;padding:10px 12px;font-size:.9rem}
-.chosen{display:flex;align-items:center;gap:10px;background:var(--accent-soft);border:1px solid var(--accent);border-radius:10px;padding:10px 12px}
-.pnum{font-weight:700;font-variant-numeric:tabular-nums;flex:none}
-.pname{flex:1;min-width:0;overflow-wrap:anywhere}
-.plist{display:flex;flex-direction:column;max-height:300px;overflow-y:auto;-webkit-overflow-scrolling:touch}
-.pick{display:flex;align-items:center;gap:10px;width:100%;text-align:right;background:none;border:none;border-bottom:1px solid var(--line);padding:11px 2px;min-height:44px}
-.pick .pnum{color:var(--accent)}
-.plist .label{padding-top:8px}
-.prow{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);min-height:44px}
-.prow:last-child{border-bottom:none}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:14px}
+.label{font-size:.78rem;letter-spacing:.03em;color:var(--muted);font-weight:600}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.note{font-size:.85rem;color:var(--muted);margin:0}
+.warn{font-size:.85rem;color:var(--danger);margin:0}
+.empty{color:var(--muted);font-size:.92rem;margin:0}
+.fields{display:flex;flex-direction:column;gap:8px}
 .stack{display:flex;flex-direction:column;gap:4px}
 .stack input{width:100%}
 .req{color:var(--danger)}
+input[type=text],input[type=search],input[type=email],input[type=url]{font:inherit;-webkit-appearance:none;appearance:none;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px;min-width:0}
+input.ltr{direction:ltr;text-align:left}
+.primary{border:none;background:var(--accent);color:var(--on-accent);border-radius:12px;padding:14px;font-weight:700;font-size:1.05rem}
+.secondary{border:1px solid var(--line);background:transparent;border-radius:12px;padding:12px;font-weight:500}
+.primary:disabled,.secondary:disabled{opacity:.45;cursor:not-allowed}
+.linkbtn{background:none;border:none;color:var(--accent);font-size:.85rem;padding:4px}
+.del{border:none;background:none;color:var(--danger);font-size:1.2rem;min-width:44px;height:44px;flex:none}
+
+/* Day strip and calendar share the same report states. */
 .days{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scroll-snap-type:x proximity}
-.day{flex:0 0 auto;width:48px;border:1px solid var(--line);background:var(--paper);border-radius:10px;padding:6px 0;
-  display:flex;flex-direction:column;align-items:center;gap:1px;scroll-snap-align:center;font-variant-numeric:tabular-nums}
+.day{flex:0 0 auto;width:48px;border:1px solid var(--line);background:var(--paper);border-radius:10px;padding:6px 0 7px;
+  display:flex;flex-direction:column;align-items:center;gap:1px;scroll-snap-align:center;font-variant-numeric:tabular-nums;border-bottom-width:3px}
 .day small{font-size:.72rem;color:var(--muted)}
 .day .n{font-weight:700;font-size:1.05rem}
-.day .h{font-size:.72rem;min-height:1.1em;color:var(--accent);font-weight:500}
-.day.weekend{background:transparent;border-style:dashed}
+.day .h{font-size:.72rem;min-height:1.1em;font-weight:600;color:var(--muted)}
+.day.off{background:transparent;border-style:dashed;border-bottom-width:1px}
+.ok{border-bottom-color:var(--ok)}
+.short{border-bottom-color:var(--mark)}
+.low,.missing{border-bottom-color:var(--danger)}
+.rest{border-bottom-color:var(--accent)}
+.day.rest .h{color:var(--accent);font-size:.66rem}
+.daybar{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:32px;margin-top:-8px}
+.daybar span{font-size:.85rem;font-weight:600;color:var(--accent)}
+.daybar .linkbtn{margin-inline-start:auto}
 .day.today .n{color:var(--accent)}
 .day.sel{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
 .day.sel small,.day.sel .h,.day.sel .n{color:var(--on-accent)}
-.card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:14px}
-.label{font-size:.78rem;letter-spacing:.04em;color:var(--muted);font-weight:500}
-.row{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
-.chip{border:1px solid var(--line);background:transparent;border-radius:999px;padding:8px 14px;font-size:.95rem}
-.chip.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:700}
-.linkbtn{background:none;border:none;color:var(--accent);font-size:.85rem;padding:4px}
-input[type=text],input[type=search],input[type=email],input[type=url]{font:inherit;-webkit-appearance:none;appearance:none;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px;min-width:0}
-input.ltr{direction:ltr;text-align:left}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.cal .head{text-align:center;font-size:.72rem;color:var(--muted)}
+.cell{border:1px solid var(--line);background:var(--bg);border-radius:8px;min-height:52px;padding:4px 0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-variant-numeric:tabular-nums}
+.cell .n{font-size:.8rem;color:var(--muted)}
+.cell .h{font-weight:700;font-size:.92rem;min-height:1.3em}
+.cell .h.t{font-weight:600;font-size:.66rem;line-height:1.9}
+.cell.rest{background:var(--accent-soft);border-color:var(--accent)}
+.cell.ok{background:var(--ok-soft);border-color:var(--ok)}
+.cell.short{background:var(--mark-soft);border-color:var(--mark)}
+.cell.low,.cell.missing{background:var(--danger-soft);border-color:var(--danger)}
+.cell.off{background:transparent;border-style:dashed}
+.cell.today .n{color:var(--accent);font-weight:700}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.78rem;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-inline-end:5px}
+.legend .a{background:var(--ok)} .legend .b{background:var(--mark)} .legend .c{background:var(--danger)} .legend .d{background:var(--accent)}
+
+.chosen{display:flex;align-items:center;gap:10px;background:var(--accent-soft);border:1px solid var(--accent);border-radius:10px;padding:10px 12px}
+.pnum{font-size:.74rem;color:var(--muted);font-variant-numeric:tabular-nums;flex:none}
+.pname{flex:1;min-width:0;overflow-wrap:anywhere;font-weight:600}
+.porig{display:block;font-size:.76rem;font-weight:400;color:var(--muted)}
+.porig:empty{display:none}
+.sug{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.sugbtn{border:1px solid var(--accent);background:var(--accent-soft);border-radius:10px;padding:9px 10px;text-align:start;display:flex;flex-direction:column;gap:1px;min-height:60px;min-width:0}
+.sugbtn .pname{font-size:.92rem;line-height:1.25;flex:none}
+.plist{display:flex;flex-direction:column;max-height:260px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.pick{display:flex;align-items:center;gap:10px;width:100%;text-align:start;background:none;border:none;border-bottom:1px solid var(--line);padding:11px 2px;min-height:44px}
+.prow{display:flex;align-items:center;flex-wrap:wrap;gap:4px 10px;padding:9px 0;border-bottom:1px solid var(--line);min-height:44px}
+.prow:last-child{border-bottom:none}
+.aliasedit{flex-basis:100%;display:flex;align-items:center;gap:8px}
+.aliasedit input{flex:1}
 .stepper{display:flex;align-items:center;gap:12px;justify-content:center}
 .stepper button{width:48px;height:48px;border-radius:12px;border:1px solid var(--line);background:var(--bg);font-size:1.5rem}
-.stepper output{font-size:2.4rem;font-weight:700;min-width:3.2em;text-align:center;font-variant-numeric:tabular-nums}
-.primary{border:none;background:var(--accent);color:var(--on-accent);border-radius:12px;padding:14px;font-weight:700;font-size:1.05rem}
-.primary:disabled,.secondary:disabled{opacity:.45;cursor:not-allowed}
-.secondary{border:1px solid var(--line);background:transparent;border-radius:12px;padding:12px;font-weight:500}
+.stepper output{font-size:2.4rem;font-weight:800;min-width:2.6em;text-align:center;font-variant-numeric:tabular-nums}
+.chips{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.chip{border:1px solid var(--line);background:transparent;border-radius:10px;padding:9px 0;font-size:1rem;font-variant-numeric:tabular-nums}
+.chip.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:700}
+
 .log{display:flex;flex-direction:column}
-.log .item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
-.log .item:last-child{border-bottom:none}
-.log .p{flex:1;min-width:0;overflow-wrap:anywhere}
+.item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.item:last-child{border-bottom:none}
+.item .p{flex:1;min-width:0;overflow-wrap:anywhere}
+.hbtn{border:1px solid var(--line);background:var(--bg);border-radius:8px;min-width:52px;height:40px;font-weight:700;font-variant-numeric:tabular-nums}
+.sentmark{font-size:.72rem;color:var(--ok);font-weight:700}
+.edit{flex-basis:100%;display:flex;align-items:center;justify-content:center;gap:12px;padding:4px 0}
+.edit button.step{width:44px;height:44px;border-radius:10px;border:1px solid var(--line);background:var(--bg);font-size:1.3rem}
+.edit output{font-size:1.5rem;font-weight:800;min-width:2.4em;text-align:center;font-variant-numeric:tabular-nums}
 .hh{font-variant-numeric:tabular-nums;font-weight:700}
-.del{border:none;background:none;color:var(--danger);font-size:1.2rem;min-width:44px;height:44px;flex:none}
-.empty{color:var(--muted);font-size:.92rem;margin:0}
+
+.wknav{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.wknav span{font-weight:700}
+.wknav button{width:44px;height:40px;border:1px solid var(--line);border-radius:10px;background:var(--paper);font-size:1.15rem}
+.wgrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;text-align:center}
+.wgrid small{font-size:.72rem;color:var(--muted);display:block}
+.wgrid input{width:100%;text-align:center;padding:9px 0;font-variant-numeric:tabular-nums;font-weight:600}
+.wgrid input:disabled{background:var(--ok-soft);color:var(--ok);border-color:var(--ok);opacity:1}
+.wgrid input.rest{background:transparent;border-style:dashed}
+.wday{border:none;background:none;padding:2px 0;min-height:44px;min-width:0}
+.wday b{display:block}
+.wday.marked small{color:var(--accent);font-weight:700}
+.wproject{display:flex;flex-direction:column;gap:6px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.wtotal{font-weight:700;font-variant-numeric:tabular-nums;border-bottom:3px solid transparent;padding-bottom:3px}
+
 .sum{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
 .sum td{padding:8px 0;border-bottom:1px solid var(--line)}
-.sum td:last-child{text-align:left;font-weight:700}
+.sum td:last-child{text-align:end;font-weight:700}
 .sum tr:last-child td{border-bottom:none}
-.note{font-size:.85rem;color:var(--muted);margin:0}
 .xlist{display:flex;flex-direction:column}
 .xrow{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
 .xrow:last-child{border-bottom:none}
@@ -101,38 +176,55 @@ input.ltr{direction:ltr;text-align:left}
 .xrow .p{flex:1;min-width:0;overflow-wrap:anywhere}
 .xrow .hh{flex:none}
 .xrow.done{color:var(--muted)}
-.xrow .ok{color:var(--ok);font-weight:700;flex:none}
-.fields{display:flex;flex-direction:column;gap:8px}
-.warn{font-size:.85rem;color:var(--danger);margin:0}
-.good{font-size:.85rem;color:var(--ok);margin:0}
-.toast{position:fixed;bottom:calc(72px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);
-  padding:10px 16px;border-radius:10px;font-size:.9rem;z-index:5;max-width:calc(100vw - 32px)}
+.xrow .sentmark{flex:none}
+
+.modal{position:fixed;inset:0;z-index:6;background:rgba(10,18,28,.55);display:flex;align-items:flex-end;justify-content:center;
+  padding:16px;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+.sheet{background:var(--paper);border-radius:16px;padding:18px;width:100%;max-width:480px;max-height:80vh;display:flex;flex-direction:column;gap:12px}
+.sheet h2{font-size:1.1rem;margin:0}
+.mlist{overflow-y:auto;display:flex;flex-direction:column;gap:6px;font-size:.92rem}
+.mlist p{margin:0}
+.mbtns{display:flex;flex-direction:column;gap:8px}
+.toast{position:fixed;bottom:calc(76px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);
+  padding:10px 16px;border-radius:10px;font-size:.9rem;z-index:7;max-width:calc(100vw - 32px)}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <h1>יומן שעות</h1>
-    <div class="total">סה״כ בחודש: <b id="mtotal">0</b> ש׳</div>
-  </header>
-
-  <div class="banner" id="banner" role="alert" hidden></div>
-
-  <div class="month" id="monthbar">
-    <button class="iconbtn" id="prev" aria-label="חודש קודם">›</button>
-    <span id="mname"></span>
-    <button class="iconbtn" id="next" aria-label="חודש הבא">‹</button>
+<header class="hero">
+  <div class="hero-in">
+    <div class="hero-top">
+      <h1>יומן שעות</h1>
+      <button class="gear" id="gear" aria-label="הגדרות">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-2.88 1.2V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-2.88-1.2l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0-1.2-2.88H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.2-2.88l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 2.88-1.2V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 2.88 1.2l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0 1.2 2.88H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1z"/></svg>
+      </button>
+    </div>
+    <div class="month" id="monthbar">
+      <button class="navbtn" id="prev" aria-label="חודש קודם">›</button>
+      <span id="mname"></span>
+      <button class="navbtn" id="next" aria-label="חודש הבא">‹</button>
+    </div>
+    <div class="block" aria-label="סיכום החודש">
+      <div><small>דווח</small><b class="num" id="mtotal">0</b></div>
+      <div><small>נדרש עד היום</small><b class="num" id="mneed">0</b></div>
+      <div><small id="mgaplabel">חסר</small><b class="num" id="mgap">0</b></div>
+    </div>
   </div>
+</header>
+
+<div class="wrap">
+  <div class="banner" id="banner" role="alert" hidden></div>
 
   <div class="tab" id="tab-report">
     <div class="days" id="days" aria-label="ימים בחודש"></div>
+    <div class="daybar" id="daybar"><span id="dmark"></span><button class="linkbtn" id="dmarkbtn"></button></div>
     <section class="card" aria-labelledby="addh">
       <span class="label" id="addh">פרויקט</span>
       <div class="chosen" id="chosen" hidden>
-        <span class="pnum" id="cnum"></span><span class="pname" id="cname"></span>
+        <span class="pname" id="cname"></span><span class="pnum" id="cnum"></span>
         <button class="linkbtn" id="change">החלפה</button>
       </div>
       <div class="fields" id="picker">
+        <div class="sug" id="sug"></div>
         <input type="search" id="psearch" placeholder="חיפוש לפי מספר או שם" autocomplete="off" enterkeyhint="search" aria-label="חיפוש פרויקט">
         <div class="plist" id="plist"></div>
       </div>
@@ -151,6 +243,46 @@ input.ltr{direction:ltr;text-align:left}
     </section>
   </div>
 
+  <div class="tab" id="tab-week" hidden>
+    <div class="wknav">
+      <button id="wprev" aria-label="שבוע קודם">›</button>
+      <span id="wname"></span>
+      <button id="wnext" aria-label="שבוע הבא">‹</button>
+    </div>
+    <section class="card" aria-label="דיווח שבועי">
+      <div class="wgrid" id="whead"></div>
+      <div class="fields" id="wrows"></div>
+      <div class="wgrid" id="wtotals"></div>
+      <p class="note">כותבים שעות ישירות במשבצת. משבצת ירוקה כבר נשלחה ואפשר לשנות אותה רק בדיווח היומי. לחיצה על יום למעלה מסמנת חופש, מחלה או חג.</p>
+    </section>
+    <section class="card" aria-labelledby="waddh">
+      <span class="label" id="waddh">הוספת פרויקט לשבוע</span>
+      <input type="search" id="wsearch" placeholder="חיפוש לפי מספר או שם" autocomplete="off" enterkeyhint="search" aria-label="חיפוש פרויקט לשבוע">
+      <div class="plist" id="wlist"></div>
+    </section>
+  </div>
+
+  <div class="tab" id="tab-month" hidden>
+    <section class="card" aria-labelledby="calh">
+      <span class="label" id="calh">פריסה חודשית</span>
+      <div class="cal" id="cal"></div>
+      <div class="legend"><span><i class="a"></i>תקין</span><span><i class="b"></i>מתחת לנורמה</span><span><i class="c"></i>חסר או מתחת למינימום</span><span><i class="d"></i>חופש, מחלה או חג</span></div>
+    </section>
+    <section class="card" aria-labelledby="sumh">
+      <span class="label" id="sumh">סיכום לפי פרויקט</span>
+      <div id="sum"></div>
+    </section>
+    <section class="card" aria-labelledby="exph">
+      <div class="row"><span class="label" id="exph">קובץ למאסטר פלן</span><button class="linkbtn" id="xall">ניקוי הבחירה</button></div>
+      <div class="xlist" id="xrows"></div>
+      <div class="fields" id="xwarn"></div>
+      <button class="primary" id="xsend">שליחה במייל</button>
+      <button class="secondary" id="xshare">שיתוף הקובץ בדרך אחרת</button>
+      <button class="secondary" id="xdone">סימון השורות כנשלחו</button>
+      <p class="note" id="xnote"></p>
+    </section>
+  </div>
+
   <div class="tab" id="tab-projects" hidden>
     <section class="card" aria-labelledby="newh">
       <span class="label" id="newh">פרויקט חדש</span>
@@ -162,27 +294,13 @@ input.ltr{direction:ltr;text-align:left}
     <section class="card" aria-labelledby="allh">
       <div class="row"><span class="label" id="allh">כל הפרויקטים</span><span class="note" id="pcount"></span></div>
       <input type="search" id="asearch" placeholder="חיפוש לפי מספר או שם" autocomplete="off" enterkeyhint="search" aria-label="חיפוש ברשימת הפרויקטים">
+      <p class="note">הכינוי מוצג רק באפליקציה. בקובץ למאסטר פלן נשאר השם המקורי.</p>
       <div id="pall"></div>
     </section>
   </div>
 
-  <div class="tab" id="tab-export" hidden>
-    <section class="card" aria-labelledby="sumh">
-      <span class="label" id="sumh">סיכום לפי פרויקט</span>
-      <div id="sum"></div>
-    </section>
-    <section class="card" aria-labelledby="exph">
-      <div class="row"><span class="label" id="exph">קובץ למאסטר פלן</span><button class="linkbtn" id="xall">ניקוי הבחירה</button></div>
-      <div class="xlist" id="xrows"></div>
-      <div class="fields" id="xwarn"></div>
-      <button class="primary" id="xsend">שליחה במייל</button>
-      <button class="secondary" id="xshare">שיתוף הקובץ בדרך אחרת</button>
-      <button class="secondary" id="xdone">סימון השורות כנקלטו</button>
-      <p class="note" id="xnote"></p>
-    </section>
-  </div>
-
   <div class="tab" id="tab-settings" hidden>
+    <button class="linkbtn" id="sback" style="align-self:flex-start">חזרה ›</button>
     <section class="card" id="installcard" hidden>
       <span class="label">התקנה באייפון</span>
       <p class="note">ב-Safari לוחצים על כפתור השיתוף, בוחרים "הוסף למסך הבית", ופותחים את האפליקציה מהאייקון החדש. כדאי לחבר את הגיבוי רק משם, כי לאפליקציה במסך הבית יש אחסון נפרד מ-Safari.</p>
@@ -200,15 +318,30 @@ input.ltr{direction:ltr;text-align:left}
       <label class="stack"><span>כתובת המייל לקבלת הקובץ</span><input type="email" class="ltr" id="smail" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
       <button class="secondary" id="stest">שליחת מייל בדיקה</button>
     </section>
+    <section class="card" aria-labelledby="copyh">
+      <span class="label" id="copyh">עותק גיבוי בקובץ</span>
+      <p class="note">קובץ עם כל הפרויקטים והדיווחים, לשמירה נוספת מחוץ ל-Google. הייבוא מוסיף לנתונים הקיימים ולא דורס אותם, והוא עובד גם עם העותקים היומיים מ-Google Drive.</p>
+      <button class="secondary" id="bsave">שמירת עותק לקובץ</button>
+      <button class="secondary" id="bload">ייבוא מקובץ גיבוי</button>
+      <input type="file" id="bfile" accept=".json,application/json" hidden>
+    </section>
   </div>
 </div>
 
 <nav class="tabbar" aria-label="לשוניות">
-  <button data-tab="report" aria-current="page">דיווח</button>
-  <button data-tab="projects">פרויקטים</button>
-  <button data-tab="export">קובץ חודשי</button>
-  <button data-tab="settings">הגדרות</button>
+  <button data-tab="report" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>דיווח</button>
+  <button data-tab="week"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M9 5v14M15 5v14M3 12h18"/></svg>שבוע</button>
+  <button data-tab="month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>חודש</button>
+  <button data-tab="projects"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V8l8-5 8 5v13"/><path d="M4 21h16M10 21v-6h4v6"/></svg>פרויקטים</button>
 </nav>
+
+<div class="modal" id="modal" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="mtitle">
+    <h2 id="mtitle"></h2>
+    <div class="mlist" id="mbody"></div>
+    <div class="mbtns" id="mbtns"></div>
+  </div>
+</div>
 
 <script src="xlsx.js"></script>
 <script src="app.js"></script>
