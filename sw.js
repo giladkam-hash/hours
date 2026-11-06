@@ -1,5 +1,5 @@
 /* Keeps the app openable without internet. Only this site's own files are cached, never reports. */
-const CACHE = "hours-v3";
+const CACHE = "hours-v4";
 const FILES = ["./", "index.html", "app.js", "xlsx.js", "manifest.webmanifest", "icon-180.png", "icon-512.png"];
 
 self.addEventListener("install", event => {

@@ -2,7 +2,7 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://script.google.com https://script.googleusercontent.com">
 <title>יומן שעות</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -19,19 +19,19 @@
   --bg:#f2efe7; --paper:#fffdf8; --ink:#17232f; --muted:#657080; --line:#ded8ca;
   --sheet:#14375a; --sheet-ink:#f4f7fb; --sheet-muted:#a9bfd6; --sheet-line:rgba(255,255,255,.22); --sheet-grid:rgba(255,255,255,.055);
   --accent:#17609f; --accent-soft:#e0ebf5; --on-accent:#ffffff;
-  --ok:#2a8259; --ok-soft:#dff0e7; --mark:#b86e0b; --mark-soft:#fbeed7; --danger:#b8322a; --danger-soft:#fae6e3;
+  --ok:#2a8259; --ok-soft:#dff0e7; --mark:#a86205; --mark-soft:#fbeed7; --danger:#b8322a; --danger-soft:#fae6e3; --rest:#5361ad; --rest-soft:#e4e7f6;
   color-scheme:light;
 }
 @media (prefers-color-scheme:dark){:root{
   --bg:#0f151c; --paper:#18212b; --ink:#e7edf3; --muted:#95a3b3; --line:#2c3845;
   --sheet:#10283f; --sheet-line:rgba(255,255,255,.16);
   --accent:#6cabec; --accent-soft:#1c3047; --on-accent:#0b1520;
-  --ok:#6fcf9b; --ok-soft:#183228; --mark:#f0b04f; --mark-soft:#3a2c14; --danger:#f19088; --danger-soft:#3b2120;
+  --ok:#6fcf9b; --ok-soft:#183228; --mark:#f0b04f; --mark-soft:#3a2c14; --danger:#f19088; --danger-soft:#3b2120; --rest:#a4b1f0; --rest-soft:#252b47;
   color-scheme:dark}}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;font-size:16px;line-height:1.45}
+html{-webkit-text-size-adjust:100%;touch-action:pan-x pan-y}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;font-size:1rem;line-height:1.45}
 button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .num{direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums}
@@ -43,16 +43,19 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .hero-in{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
 .hero-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
 h1{font-weight:800;font-size:1.45rem;margin:0;letter-spacing:-.01em}
-.gear{width:44px;height:44px;border:1px solid var(--sheet-line);border-radius:10px;background:transparent;color:var(--sheet-ink);display:grid;place-items:center}
-.gear svg{width:22px;height:22px}
+.gear{width:44px;height:44px;padding:0;border:1px solid var(--sheet-line);border-radius:10px;background:transparent;color:var(--sheet-ink);display:flex;align-items:center;justify-content:center;flex:none}
+.gear svg{width:22px;height:22px;display:block;flex:none}
 .month{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.month span{font-weight:700;font-size:1.05rem}
+.mname{border:none;background:none;color:var(--sheet-ink);font-weight:700;font-size:1.05rem;padding:8px 10px;min-height:40px}
+.mname::after{content:"▾";margin-inline-start:6px;font-size:.8em;opacity:.75}
 .navbtn{width:44px;height:40px;border:1px solid var(--sheet-line);border-radius:10px;background:transparent;color:var(--sheet-ink);font-size:1.15rem}
 .block{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--sheet-line);border-radius:8px}
 .block div{padding:7px 10px;min-width:0;display:flex;flex-direction:column}
 .block div+div{border-inline-start:1px solid var(--sheet-line)}
 .block small{font-size:.72rem;color:var(--sheet-muted)}
 .block b{font-size:1.25rem;font-weight:700}
+.prog{height:5px;border-radius:3px;background:var(--sheet-line);overflow:hidden}
+.prog i{display:block;height:100%;background:var(--sheet-ink);border-radius:3px;transition:width .25s ease}
 
 .wrap{max-width:560px;margin:0 auto;padding-top:16px;padding-bottom:calc(92px + env(safe-area-inset-bottom,0px));
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
@@ -60,8 +63,9 @@ h1{font-weight:800;font-size:1.45rem;margin:0;letter-spacing:-.01em}
 .tab{display:flex;flex-direction:column;gap:16px}
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:4;display:flex;background:var(--paper);border-top:1px solid var(--line);
   padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
-.tabbar button{flex:1;min-width:0;border:none;background:none;padding:8px 2px 7px;font-size:.76rem;font-weight:500;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:2px}
+.tabbar button{flex:1;min-width:0;border:none;background:none;padding:8px 2px 7px;font-size:12px;font-weight:500;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:2px;position:relative}
 .tabbar svg{width:23px;height:23px}
+.tabbar .dot{position:absolute;top:6px;inset-inline-end:calc(50% - 17px);width:8px;height:8px;border-radius:50%;background:var(--danger)}
 .tabbar button[aria-current="page"]{color:var(--accent);font-weight:700}
 
 .banner{background:var(--danger-soft);color:var(--danger);border:1px solid var(--danger);border-radius:10px;padding:10px 12px;font-size:.9rem}
@@ -75,8 +79,27 @@ h1{font-weight:800;font-size:1.45rem;margin:0;letter-spacing:-.01em}
 .stack{display:flex;flex-direction:column;gap:4px}
 .stack input{width:100%}
 .req{color:var(--danger)}
-input[type=text],input[type=search],input[type=email],input[type=url]{font:inherit;-webkit-appearance:none;appearance:none;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px;min-width:0}
+/* Inputs stay at 16px or more, otherwise iOS zooms in on focus. */
+input[type=text],input[type=search],input[type=email],input[type=url],input[type=date],select{font:inherit;font-size:max(1rem,16px);-webkit-appearance:none;appearance:none;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px;min-width:0}
 input.ltr{direction:ltr;text-align:left}
+input.masked{-webkit-text-security:disc}
+.check{display:flex;align-items:center;gap:10px;min-height:44px}
+.check input{width:22px;height:22px;flex:none;accent-color:var(--accent)}
+.opts{display:flex;flex-wrap:wrap;gap:6px}
+.opt{border:1px solid var(--line);background:transparent;border-radius:9px;padding:7px 11px;font-size:.88rem;min-height:38px}
+.opt[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:700}
+#stheme .opt::before{content:"";display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--swatch);margin-inline-end:6px;vertical-align:-1px}
+.reminder{border:1px solid var(--mark);background:var(--mark-soft);color:var(--ink);border-radius:10px;padding:10px 12px;text-align:start;font-size:.9rem}
+.cloud summary{cursor:pointer;font-size:.78rem;letter-spacing:.03em;color:var(--muted);font-weight:600;min-height:28px}
+.cloud[open]{display:flex;flex-direction:column;gap:14px}
+.danger{color:var(--danger);border-color:var(--danger)}
+.primary.danger{background:var(--danger);color:var(--paper)}
+.pencil{width:44px;height:44px;padding:0;border:none;background:none;color:var(--accent);display:flex;align-items:center;justify-content:center;flex:none}
+.pencil svg{width:20px;height:20px;display:block}
+.mgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.mcell{position:relative;border:1px solid var(--line);background:transparent;border-radius:9px;padding:10px 2px;font-size:.88rem;min-height:44px}
+.mcell[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:700}
+.mcell.waiting::after{content:"";position:absolute;top:5px;inset-inline-start:5px;width:7px;height:7px;border-radius:50%;background:var(--danger)}
 .primary{border:none;background:var(--accent);color:var(--on-accent);border-radius:12px;padding:14px;font-weight:700;font-size:1.05rem}
 .secondary{border:1px solid var(--line);background:transparent;border-radius:12px;padding:12px;font-weight:500}
 .primary:disabled,.secondary:disabled{opacity:.45;cursor:not-allowed}
@@ -85,7 +108,7 @@ input.ltr{direction:ltr;text-align:left}
 
 /* Day strip and calendar share the same report states. */
 .days{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scroll-snap-type:x proximity}
-.day{flex:0 0 auto;width:48px;border:1px solid var(--line);background:var(--paper);border-radius:10px;padding:6px 0 7px;
+.day{position:relative;flex:0 0 auto;width:3rem;border:1px solid var(--line);background:var(--paper);border-radius:10px;padding:6px 0 7px;
   display:flex;flex-direction:column;align-items:center;gap:1px;scroll-snap-align:center;font-variant-numeric:tabular-nums;border-bottom-width:3px}
 .day small{font-size:.72rem;color:var(--muted)}
 .day .n{font-weight:700;font-size:1.05rem}
@@ -94,21 +117,25 @@ input.ltr{direction:ltr;text-align:left}
 .ok{border-bottom-color:var(--ok)}
 .short{border-bottom-color:var(--mark)}
 .low,.missing{border-bottom-color:var(--danger)}
-.rest{border-bottom-color:var(--accent)}
-.day.rest .h{color:var(--accent);font-size:.66rem}
+.rest{border-bottom-color:var(--rest)}
+.day.rest .h{color:var(--rest);font-size:.66rem}
+.hol::before{content:"";position:absolute;top:5px;inset-inline-start:5px;width:6px;height:6px;border-radius:50%;background:var(--mark)}
 .daybar{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:32px;margin-top:-8px}
-.daybar span{font-size:.85rem;font-weight:600;color:var(--accent)}
-.daybar .linkbtn{margin-inline-start:auto}
+.daytext{display:flex;flex-direction:column;min-width:0}
+.daytext span{font-size:.85rem;font-weight:600;color:var(--rest)}
+.daytext span:empty,.daytext small:empty{display:none}
+.daytext small{font-size:.82rem;color:var(--mark);font-weight:600}
+.daybar .linkbtn{margin-inline-start:auto;flex:none}
 .day.today .n{color:var(--accent)}
 .day.sel{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
 .day.sel small,.day.sel .h,.day.sel .n{color:var(--on-accent)}
 .cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
 .cal .head{text-align:center;font-size:.72rem;color:var(--muted)}
-.cell{border:1px solid var(--line);background:var(--bg);border-radius:8px;min-height:52px;padding:4px 0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-variant-numeric:tabular-nums}
+.cell{position:relative;border:1px solid var(--line);background:var(--bg);border-radius:8px;min-height:52px;padding:4px 0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-variant-numeric:tabular-nums}
 .cell .n{font-size:.8rem;color:var(--muted)}
 .cell .h{font-weight:700;font-size:.92rem;min-height:1.3em}
-.cell .h.t{font-weight:600;font-size:.66rem;line-height:1.9}
-.cell.rest{background:var(--accent-soft);border-color:var(--accent)}
+.cell .h.t{font-weight:600;font-size:min(.66rem,11px);line-height:1.9}
+.cell.rest{background:var(--rest-soft);border-color:var(--rest)}
 .cell.ok{background:var(--ok-soft);border-color:var(--ok)}
 .cell.short{background:var(--mark-soft);border-color:var(--mark)}
 .cell.low,.cell.missing{background:var(--danger-soft);border-color:var(--danger)}
@@ -116,7 +143,7 @@ input.ltr{direction:ltr;text-align:left}
 .cell.today .n{color:var(--accent);font-weight:700}
 .legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.78rem;color:var(--muted)}
 .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-inline-end:5px}
-.legend .a{background:var(--ok)} .legend .b{background:var(--mark)} .legend .c{background:var(--danger)} .legend .d{background:var(--accent)}
+.legend .a{background:var(--ok)} .legend .b{background:var(--mark)} .legend .c{background:var(--danger)} .legend .d{background:var(--rest)} .legend .e{background:var(--mark);border-radius:50%}
 
 .chosen{display:flex;align-items:center;gap:10px;background:var(--accent-soft);border:1px solid var(--accent);border-radius:10px;padding:10px 12px}
 .pnum{font-size:.74rem;color:var(--muted);font-variant-numeric:tabular-nums;flex:none}
@@ -158,7 +185,7 @@ input.ltr{direction:ltr;text-align:left}
 .wgrid input{width:100%;text-align:center;padding:9px 0;font-variant-numeric:tabular-nums;font-weight:600}
 .wgrid input:disabled{background:var(--ok-soft);color:var(--ok);border-color:var(--ok);opacity:1}
 .wgrid input.rest{background:transparent;border-style:dashed}
-.wday{border:none;background:none;padding:2px 0;min-height:44px;min-width:0}
+.wday{position:relative;border:none;background:none;padding:2px 0;min-height:44px;min-width:0}
 .wday b{display:block}
 .wday.marked small{color:var(--accent);font-weight:700}
 .wproject{display:flex;flex-direction:column;gap:6px;padding-bottom:12px;border-bottom:1px solid var(--line)}
@@ -180,9 +207,13 @@ input.ltr{direction:ltr;text-align:left}
 
 .modal{position:fixed;inset:0;z-index:6;background:rgba(10,18,28,.55);display:flex;align-items:flex-end;justify-content:center;
   padding:16px;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))}
-.sheet{background:var(--paper);border-radius:16px;padding:18px;width:100%;max-width:480px;max-height:80vh;display:flex;flex-direction:column;gap:12px}
+.modal{animation:fade .15s ease-out}
+.sheet{background:var(--paper);border-radius:16px;padding:18px;width:100%;max-width:480px;max-height:86vh;overflow-y:auto;display:flex;flex-direction:column;gap:12px;animation:rise .18s ease-out}
+@keyframes fade{from{opacity:0}}
+@keyframes rise{from{transform:translateY(16px)}}
+@media (prefers-reduced-motion:reduce){.modal,.sheet{animation:none}.prog i{transition:none}}
 .sheet h2{font-size:1.1rem;margin:0}
-.mlist{overflow-y:auto;display:flex;flex-direction:column;gap:6px;font-size:.92rem}
+.mlist{display:flex;flex-direction:column;gap:8px;font-size:.92rem}
 .mlist p{margin:0}
 .mbtns{display:flex;flex-direction:column;gap:8px}
 .toast{position:fixed;bottom:calc(76px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);
@@ -200,7 +231,7 @@ input.ltr{direction:ltr;text-align:left}
     </div>
     <div class="month" id="monthbar">
       <button class="navbtn" id="prev" aria-label="חודש קודם">›</button>
-      <span id="mname"></span>
+      <button class="mname" id="mname" aria-label="בחירת חודש"></button>
       <button class="navbtn" id="next" aria-label="חודש הבא">‹</button>
     </div>
     <div class="block" aria-label="סיכום החודש">
@@ -208,6 +239,7 @@ input.ltr{direction:ltr;text-align:left}
       <div><small>נדרש עד היום</small><b class="num" id="mneed">0</b></div>
       <div><small id="mgaplabel">חסר</small><b class="num" id="mgap">0</b></div>
     </div>
+    <div class="prog" id="prog" hidden><i id="mbar"></i></div>
   </div>
 </header>
 
@@ -216,7 +248,7 @@ input.ltr{direction:ltr;text-align:left}
 
   <div class="tab" id="tab-report">
     <div class="days" id="days" aria-label="ימים בחודש"></div>
-    <div class="daybar" id="daybar"><span id="dmark"></span><button class="linkbtn" id="dmarkbtn"></button></div>
+    <div class="daybar" id="daybar"><div class="daytext"><span id="dmark"></span><small id="dhol"></small></div><button class="linkbtn" id="dmarkbtn"></button></div>
     <section class="card" aria-labelledby="addh">
       <span class="label" id="addh">פרויקט</span>
       <div class="chosen" id="chosen" hidden>
@@ -226,6 +258,7 @@ input.ltr{direction:ltr;text-align:left}
       <div class="fields" id="picker">
         <div class="sug" id="sug"></div>
         <input type="search" id="psearch" placeholder="חיפוש לפי מספר או שם" autocomplete="off" enterkeyhint="search" aria-label="חיפוש פרויקט">
+        <button class="linkbtn" id="pshow" style="align-self:flex-start"></button>
         <div class="plist" id="plist"></div>
       </div>
       <span class="label">שעות</span>
@@ -266,14 +299,20 @@ input.ltr{direction:ltr;text-align:left}
     <section class="card" aria-labelledby="calh">
       <span class="label" id="calh">פריסה חודשית</span>
       <div class="cal" id="cal"></div>
-      <div class="legend"><span><i class="a"></i>תקין</span><span><i class="b"></i>מתחת לנורמה</span><span><i class="c"></i>חסר או מתחת למינימום</span><span><i class="d"></i>חופש, מחלה או חג</span></div>
+      <div class="legend"><span><i class="a"></i>תקין</span><span><i class="b"></i>מתחת לנורמה</span><span><i class="c"></i>חסר או מתחת למינימום</span><span><i class="d"></i>חופש, מחלה או חג</span><span><i class="e"></i>חג או יום מיוחד בלוח</span></div>
+      <p class="note" id="holist" hidden></p>
     </section>
     <section class="card" aria-labelledby="sumh">
       <span class="label" id="sumh">סיכום לפי פרויקט</span>
       <div id="sum"></div>
     </section>
-    <section class="card" aria-labelledby="exph">
-      <div class="row"><span class="label" id="exph">קובץ למאסטר פלן</span><button class="linkbtn" id="xall">ניקוי הבחירה</button></div>
+  </div>
+
+  <div class="tab" id="tab-send" hidden>
+    <div class="fields" id="xold"></div>
+    <section class="card" aria-labelledby="xtitle">
+      <div class="row"><span class="label" id="xtitle"></span><button class="linkbtn" id="xall">ניקוי הבחירה</button></div>
+      <button class="linkbtn" id="xnow" style="align-self:flex-start" hidden>חזרה לחודש הנוכחי</button>
       <div class="xlist" id="xrows"></div>
       <div class="fields" id="xwarn"></div>
       <button class="primary" id="xsend">שליחה במייל</button>
@@ -294,7 +333,8 @@ input.ltr{direction:ltr;text-align:left}
     <section class="card" aria-labelledby="allh">
       <div class="row"><span class="label" id="allh">כל הפרויקטים</span><span class="note" id="pcount"></span></div>
       <input type="search" id="asearch" placeholder="חיפוש לפי מספר או שם" autocomplete="off" enterkeyhint="search" aria-label="חיפוש ברשימת הפרויקטים">
-      <p class="note">הכינוי מוצג רק באפליקציה. בקובץ למאסטר פלן נשאר השם המקורי.</p>
+      <div class="stack"><span class="note">מיון</span><div class="opts" id="psort"></div></div>
+      <div class="stack"><span class="note">סינון</span><div class="opts" id="pfilter"></div></div>
       <div id="pall"></div>
     </section>
   </div>
@@ -305,12 +345,11 @@ input.ltr{direction:ltr;text-align:left}
       <span class="label">התקנה באייפון</span>
       <p class="note">ב-Safari לוחצים על כפתור השיתוף, בוחרים "הוסף למסך הבית", ופותחים את האפליקציה מהאייקון החדש. כדאי לחבר את הגיבוי רק משם, כי לאפליקציה במסך הבית יש אחסון נפרד מ-Safari.</p>
     </section>
-    <section class="card" aria-labelledby="cloudh">
-      <span class="label" id="cloudh">גיבוי לחשבון Google</span>
-      <label class="stack"><span>כתובת הסקריפט</span><input type="url" class="ltr" id="surl" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="https://script.google.com/.../exec"></label>
-      <label class="stack"><span>מפתח סודי</span><input type="text" class="ltr" id="skey" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
-      <button class="primary" id="sconnect">חיבור ושחזור מהגיבוי</button>
-      <p class="note" id="sstatus"></p>
+    <section class="card" aria-labelledby="lookh">
+      <span class="label" id="lookh">תצוגה</span>
+      <div class="stack"><span>גודל טקסט</span><div class="opts" id="sfont"></div></div>
+      <div class="stack"><span>צבע</span><div class="opts" id="stheme"></div></div>
+      <div class="stack"><span>בהיר או כהה</span><div class="opts" id="smode"></div></div>
     </section>
     <section class="card" aria-labelledby="meh">
       <span class="label" id="meh">פרטים לקובץ</span>
@@ -325,6 +364,14 @@ input.ltr{direction:ltr;text-align:left}
       <button class="secondary" id="bload">ייבוא מקובץ גיבוי</button>
       <input type="file" id="bfile" accept=".json,application/json" hidden>
     </section>
+    <details class="card cloud" id="cloud">
+      <summary>נתוני גיבוי</summary>
+      <label class="stack"><span>כתובת הסקריפט</span><input type="url" class="ltr" id="surl" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="https://script.google.com/.../exec"></label>
+      <label class="stack"><span>מפתח סודי</span><input type="text" class="ltr masked" id="skey" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
+      <button class="primary" id="sconnect">חיבור ושחזור מהגיבוי</button>
+      <p class="note" id="sstatus"></p>
+    </details>
+    <p class="note" id="sversion" style="text-align:center"></p>
   </div>
 </div>
 
@@ -332,6 +379,7 @@ input.ltr{direction:ltr;text-align:left}
   <button data-tab="report" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>דיווח</button>
   <button data-tab="week"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M9 5v14M15 5v14M3 12h18"/></svg>שבוע</button>
   <button data-tab="month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>חודש</button>
+  <button data-tab="send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 3L10 14M21 3l-7 18-4-7-7-4z"/></svg>שליחה<span class="dot" id="senddot" hidden></span></button>
   <button data-tab="projects"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V8l8-5 8 5v13"/><path d="M4 21h16M10 21v-6h4v6"/></svg>פרויקטים</button>
 </nav>
 
